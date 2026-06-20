@@ -3,157 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>LION CREDIT - Loan Consultation</title>
+<title>LION CREDIT - System</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: Arial, sans-serif;
+body{
+margin:0;
+font-family:Arial;
+background:#0b0f19;
+color:white;
 }
 
-/* ===== HERO BACKGROUND ===== */
+/* HERO */
 .hero{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  text-align:center;
-  padding:40px;
-
-  background:
-    linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.88)),
-    url("https://images.unsplash.com/photo-1508964942454-1a56651d54ac?auto=format&fit=crop&w=1800&q=80");
-  background-size:cover;
-  background-position:center;
-  color:white;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+padding:40px;
+text-align:center;
+background:
+linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.88)),
+url("https://images.unsplash.com/photo-1508964942454-1a56651d54ac?auto=format&fit=crop&w=1800&q=80");
+background-size:cover;
+background-position:center;
 }
 
-.logo{
-  font-size:26px;
-  color:#D4AF37;
-  font-weight:bold;
-}
-
+/* TITLE */
 h1{
-  font-size:48px;
-  color:#D4AF37;
-  margin-top:10px;
+color:#D4AF37;
+font-size:42px;
 }
 
-.subtitle{
-  margin-top:10px;
-  opacity:0.85;
-}
-
-/* ===== BUTTON ===== */
-.btn{
-  display:inline-block;
-  margin-top:25px;
-  padding:14px 28px;
-  background:linear-gradient(90deg,#D4AF37,#ffcc66);
-  color:black;
-  text-decoration:none;
-  border-radius:30px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.btn:hover{
-  transform:scale(1.03);
-}
-
-/* ===== SECTION ===== */
-.section{
-  padding:60px 20px;
-  text-align:center;
-  background:#0b0f19;
-  color:white;
-}
-
+/* CARD */
 .card{
-  background:rgba(255,255,255,0.05);
-  padding:20px;
-  border-radius:10px;
-  margin-top:20px;
-  display:inline-block;
-  width:260px;
+margin-top:20px;
+background:rgba(17,24,39,0.9);
+padding:20px;
+border-radius:12px;
+width:100%;
+max-width:500px;
+backdrop-filter: blur(10px);
 }
 
-/* ===== FORM SECTION ===== */
-.form-section{
-  padding:60px 20px;
-  background:#0f172a;
-  text-align:center;
+input, select{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
 }
 
-iframe{
-  width:100%;
-  max-width:800px;
-  height:900px;
-  border:none;
-  border-radius:12px;
-  background:white;
-}
-
-/* FOOTER */
-footer{
-  text-align:center;
-  padding:20px;
-  font-size:12px;
-  opacity:0.6;
-  background:#0b0f19;
+/* BUTTON */
+button{
+width:100%;
+padding:14px;
+margin-top:15px;
+background:linear-gradient(90deg,#D4AF37,#ffcc66);
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- HERO -->
 <div class="hero">
 
-<div class="logo">LION CREDIT</div>
+<h1>LION CREDIT SYSTEM</h1>
+<p>Professional Loan Application System</p>
 
-<h1>Singapore Loan Consultation</h1>
-<p class="subtitle">Fast Approval • Secure Process • No Hidden Fees</p>
+<div class="card">
 
-<a class="btn" href="#apply">Apply Now</a>
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Phone Number">
+<input id="ic" placeholder="IC Number">
+<input id="company" placeholder="Company Name">
+<input id="salary" placeholder="Monthly Salary">
 
-</div>
+<select id="loanType">
+<option>Personal Loan</option>
+<option>Business Loan</option>
+</select>
 
-<!-- FEATURES -->
-<div class="section">
+<select id="amount">
+<option>SGD 200 - 1,000</option>
+<option>SGD 1,000 - 10,000</option>
+<option>SGD 10,000 - 100,000</option>
+</select>
 
-<h2>Why Choose Us</h2>
+<input type="file" id="icFront" accept="image/*">
+<input type="file" id="icBack" accept="image/*">
 
-<div class="card">Fast Approval</div>
-<div class="card">Secure Process</div>
-<div class="card">Trusted Service</div>
-
-</div>
-
-<!-- GOOGLE FORM SECTION -->
-<div class="form-section" id="apply">
-
-<h2 style="color:#D4AF37;">Loan Application Form</h2>
-
-<p style="opacity:0.7;margin-top:10px;">
-Please fill in your details below
-</p>
-
-<!-- GOOGLE FORM EMBED -->
-<iframe 
-src="https://forms.gle/dHtDf9bpuXRDHMoQ9">
-</iframe>
+<button onclick="submitData()">Submit Application</button>
 
 </div>
 
-<footer>
-© 2025 LION CREDIT. All Rights Reserved.
-</footer>
+</div>
+
+<script>
+function submitData(){
+  alert("System version requires Firebase backend setup (next step).");
+}
+</script>
 
 </body>
 </html>
