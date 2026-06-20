@@ -1,72 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Admin Panel - LION CREDIT</title>
+<title>Admin Login - LION CREDIT</title>
 
 <style>
 body{
   font-family: Arial;
   background:#0b0f19;
   color:white;
-  padding:20px;
+  text-align:center;
+  padding:40px;
 }
-h1{color:#facc15;}
 
-.card{
+.box{
   background:#111827;
-  padding:15px;
-  margin:10px 0;
-  border-radius:10px;
+  width:320px;
+  margin:auto;
+  padding:20px;
+  border-radius:12px;
 }
 
-img{
-  width:120px;
-  border-radius:8px;
-  margin-right:10px;
+input{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
 }
 
 button{
-  padding:8px 10px;
-  margin:5px;
+  width:100%;
+  padding:10px;
+  background:#22c55e;
   border:none;
-  border-radius:6px;
+  color:white;
+  font-weight:bold;
+  border-radius:8px;
   cursor:pointer;
 }
 
-.approve{background:#22c55e;color:white;}
-.reject{background:#ef4444;color:white;}
-.delete{background:#6b7280;color:white;}
+.card{
+  background:#1f2937;
+  padding:10px;
+  margin:10px;
+  border-radius:10px;
+  text-align:left;
+}
+
+.hidden{display:none;}
 </style>
 </head>
 
 <body>
 
-<h1>📊 Loan Admin Panel</h1>
-<div id="list"></div>
+<h1>🔐 ADMIN LOGIN</h1>
 
-<!-- Firebase CDN -->
+<div id="loginBox" class="box">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<div id="adminPanel" class="hidden">
+  <h2>📊 Applications</h2>
+  <div id="list"></div>
+</div>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyA394LWxxX3_mjiiKQU5GIWTGrWSHmCVfU",
+  apiKey: "YOUR_KEY",
   authDomain: "lion-credit-system.firebaseapp.com",
-  projectId: "lion-credit-system",
+  projectId: "lion-credit-system"
 };
 
 firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
 const db = firebase.firestore();
 
+// 🔐 LOGIN
+function login(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  auth.signInWithEmailAndPassword(email, password)
+  .then(()=>{
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("adminPanel").classList.remove("hidden");
+    loadData();
+  })
+  .catch(err=>{
+    alert(err.message);
+  });
+}
+
+// 🔒 CHECK LOGIN STATE
+auth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("adminPanel").classList.remove("hidden");
+    loadData();
+  }
+});
+
+// 📊 LOAD DATA
 function loadData(){
-
   db.collection("submissions").orderBy("time","desc")
-  .onSnapshot(snapshot=>{
+  .onSnapshot(snap=>{
+    let html="";
 
-    let html = "";
-
-    snapshot.forEach(doc=>{
+    snap.forEach(doc=>{
       let d = doc.data();
 
       html += `
@@ -74,20 +121,8 @@ function loadData(){
         <b>Name:</b> ${d.name}<br>
         <b>Phone:</b> ${d.phone}<br>
         <b>Email:</b> ${d.email}<br>
-        <b>Company:</b> ${d.company}<br>
         <b>IC:</b> ${d.icnumber}<br>
-        <b>Loan:</b> ${d.loantype} - ${d.amount}<br>
-
-        <div style="margin-top:10px;">
-          ${d.icFrontURL ? `<img src="${d.icFrontURL}">` : ""}
-          ${d.icBackURL ? `<img src="${d.icBackURL}">` : ""}
-        </div>
-
-        <div>
-          <button class="approve" onclick="updateStatus('${doc.id}','approved')">Approve</button>
-          <button class="reject" onclick="updateStatus('${doc.id}','rejected')">Reject</button>
-          <button class="delete" onclick="deleteDoc('${doc.id}')">Delete</button>
-        </div>
+        <b>Loan:</b> ${d.amount}<br>
       </div>
       `;
     });
@@ -95,18 +130,6 @@ function loadData(){
     document.getElementById("list").innerHTML = html;
   });
 }
-
-function updateStatus(id,status){
-  db.collection("submissions").doc(id).update({
-    status:status
-  });
-}
-
-function deleteDoc(id){
-  db.collection("submissions").doc(id).delete();
-}
-
-loadData();
 </script>
 
 </body>
