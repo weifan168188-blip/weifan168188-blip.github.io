@@ -2,26 +2,107 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>LION CREDIT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LION CREDIT | Loan Consultation</title>
+
+<meta name="description" content="Fast loan consultation service. Business & Personal loan inquiry. Approval within 30 minutes.">
+<meta name="keywords" content="loan, personal loan, business loan, singapore loan service">
+
 <style>
 body{
+margin:0;
 font-family:Arial;
 background:#0b0f19;
 color:white;
-text-align:center;
-padding:80px;
 }
-h1{
+
+/* NAV */
+nav{
+display:flex;
+justify-content:space-between;
+padding:18px 40px;
+background:#0f172a;
+position:sticky;
+top:0;
+}
+
+.logo{
 color:#D4AF37;
-font-size:50px;
-}
-p{
 font-size:20px;
+font-weight:bold;
 }
-a{
+
+/* HERO */
+.hero{
+text-align:center;
+padding:70px 20px;
+}
+
+.hero h1{
+font-size:42px;
+color:#D4AF37;
+}
+
+.hero p{
+color:#ccc;
+}
+
+/* FORM */
+.form-box{
+background:#111827;
+max-width:500px;
+margin:30px auto;
+padding:20px;
+border-radius:10px;
+border:1px solid #1f2937;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin:8px 0;
+border-radius:5px;
+border:none;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#25D366;
+border:none;
+color:white;
+font-weight:bold;
+border-radius:5px;
+cursor:pointer;
+}
+
+.section{
+padding:50px 20px;
+text-align:center;
+}
+
+.card{
+background:#111827;
+padding:20px;
+margin:10px;
 display:inline-block;
-margin-top:20px;
-padding:12px 25px;
+width:250px;
+border-radius:10px;
+border:1px solid #1f2937;
+}
+
+/* CTA */
+.cta{
+padding:50px 20px;
+text-align:center;
+background:#0f172a;
+}
+
+.cta a{
+display:inline-block;
+margin-top:15px;
+padding:14px 25px;
 background:#25D366;
 color:white;
 text-decoration:none;
@@ -29,13 +110,67 @@ border-radius:30px;
 }
 </style>
 </head>
+
 <body>
 
-<h1>LION CREDIT</h1>
-<p>Your Trusted Loan Partner</p>
-<p>Loan SGD 200 - 100,000</p>
+<nav>
+<div class="logo">LION CREDIT</div>
+</nav>
 
-<a href="https://wa.me/6584976870">WhatsApp Us</a>
+<!-- HERO -->
+<div class="hero">
+<h1>Loan Consultation Service</h1>
+<p>Business & Personal Loan Inquiry • Fast Response • No Hidden Fees</p>
+</div>
+
+<!-- FORM -->
+<div class="form-box">
+<h3>Apply Now</h3>
+
+<input type="text" id="name" placeholder="Your Name">
+<input type="text" id="phone" placeholder="Phone Number">
+
+<select id="type">
+<option>Personal Loan</option>
+<option>Business Loan</option>
+</select>
+
+<select id="amount">
+<option>SGD 200 - 1,000</option>
+<option>SGD 1,000 - 10,000</option>
+<option>SGD 10,000 - 100,000</option>
+</select>
+
+<button onclick="sendWA()">Submit via WhatsApp</button>
+</div>
+
+<!-- FEATURES -->
+<div class="section">
+<div class="card">Fast Approval<br>Within 30 Minutes</div>
+<div class="card">No Hidden Fees<br>Transparent Process</div>
+<div class="card">Secure Service<br>Trusted Consultation</div>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+<h2>Need Assistance?</h2>
+<p>Contact us instantly on WhatsApp</p>
+<a href="https://wa.me/6584976870">Chat Now</a>
+</div>
+
+<script>
+function sendWA(){
+let name=document.getElementById('name').value;
+let phone=document.getElementById('phone').value;
+let type=document.getElementById('type').value;
+let amount=document.getElementById('amount').value;
+
+let msg=
+`Loan Inquiry:%0AName: ${name}%0APhone: ${phone}%0AType: ${type}%0AAmount: ${amount}`;
+
+window.open("https://wa.me/6584976870?text="+msg,"_blank");
+}
+</script>
 
 </body>
 </html>
