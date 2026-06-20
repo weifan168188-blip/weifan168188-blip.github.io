@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel - LION CREDIT</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#0b0f19;
+  color:white;
+  padding:20px;
+}
+h1{color:#facc15;}
+
+.card{
+  background:#111827;
+  padding:15px;
+  margin:10px 0;
+  border-radius:10px;
+}
+
+img{
+  width:120px;
+  border-radius:8px;
+  margin-right:10px;
+}
+
+button{
+  padding:8px 10px;
+  margin:5px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.approve{background:#22c55e;color:white;}
+.reject{background:#ef4444;color:white;}
+.delete{background:#6b7280;color:white;}
+</style>
+</head>
+
+<body>
+
+<h1>📊 Loan Admin Panel</h1>
+<div id="list"></div>
+
+<!-- Firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA394LWxxX3_mjiiKQU5GIWTGrWSHmCVfU",
+  authDomain: "lion-credit-system.firebaseapp.com",
+  projectId: "lion-credit-system",
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function loadData(){
+
+  db.collection("submissions").orderBy("time","desc")
+  .onSnapshot(snapshot=>{
+
+    let html = "";
+
+    snapshot.forEach(doc=>{
+      let d = doc.data();
+
+      html += `
+      <div class="card">
+        <b>Name:</b> ${d.name}<br>
+        <b>Phone:</b> ${d.phone}<br>
+        <b>Email:</b> ${d.email}<br>
+        <b>Company:</b> ${d.company}<br>
+        <b>IC:</b> ${d.icnumber}<br>
+        <b>Loan:</b> ${d.loantype} - ${d.amount}<br>
+
+        <div style="margin-top:10px;">
+          ${d.icFrontURL ? `<img src="${d.icFrontURL}">` : ""}
+          ${d.icBackURL ? `<img src="${d.icBackURL}">` : ""}
+        </div>
+
+        <div>
+          <button class="approve" onclick="updateStatus('${doc.id}','approved')">Approve</button>
+          <button class="reject" onclick="updateStatus('${doc.id}','rejected')">Reject</button>
+          <button class="delete" onclick="deleteDoc('${doc.id}')">Delete</button>
+        </div>
+      </div>
+      `;
+    });
+
+    document.getElementById("list").innerHTML = html;
+  });
+}
+
+function updateStatus(id,status){
+  db.collection("submissions").doc(id).update({
+    status:status
+  });
+}
+
+function deleteDoc(id){
+  db.collection("submissions").doc(id).delete();
+}
+
+loadData();
+</script>
+
+</body>
+</html>
