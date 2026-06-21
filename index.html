@@ -1,67 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>LION CREDIT SYSTEM</title>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-<script src="firebase.js"></script>
-
-<style>
-
-body{
-font-family:Arial;
-background:#0b0f19;
-color:white;
-margin:0;
-padding:0;
-}
-
-.container{
-max-width:700px;
-margin:auto;
-padding:30px;
-}
-
-.card{
-background:#111827;
-padding:30px;
-border-radius:20px;
-}
-
-input,select{
-width:100%;
-padding:12px;
-margin:8px 0;
-border:none;
-border-radius:10px;
-}
-
-button{
-width:100%;
-padding:15px;
-background:#f59e0b;
-border:none;
-border-radius:10px;
-font-size:16px;
-cursor:pointer;
-}
-
-button:hover{
-opacity:0.9;
-}
-
-</style>
-</head>
-<body>
-
-<div class="container">
-
-<h1>LION CREDIT SYSTEM</h1>
-
-<div class="card">
+<h2>LION CREDIT SYSTEM</h2>
 
 <input id="name" placeholder="Full Name">
 
@@ -75,101 +12,16 @@ opacity:0.9;
 
 <input id="icnumber" placeholder="IC Number">
 
-<select id="loantype">
-<option>Personal Loan</option>
-<option>Business Loan</option>
-</select>
-
-<select id="amount">
-<option>SGD 1,000 - 5,000</option>
-<option>SGD 5,000 - 20,000</option>
-<option>SGD 20,000+</option>
-</select>
+<br><br>
 
 <label>IC Front</label>
-<input type="file" id="icFront">
+<input type="file" id="icFront" accept="image/*">
 
 <label>IC Back</label>
-<input type="file" id="icBack">
+<input type="file" id="icBack" accept="image/*">
+
+<br><br>
 
 <button onclick="submitForm()">
 Submit Application
 </button>
-
-</div>
-
-</div>
-
-<script>
-
-async function uploadFile(file,path){
-
-const ref=storage.ref().child(path);
-
-await ref.put(file);
-
-return await ref.getDownloadURL();
-
-}
-
-async function submitForm(){
-
-const name=name.value;
-const phone=phone.value;
-const email=email.value;
-const company=company.value;
-const income=income.value;
-const icnumber=icnumber.value;
-
-const loantype=document.getElementById("loantype").value;
-const amount=document.getElementById("amount").value;
-
-const front=document.getElementById("icFront").files[0];
-const back=document.getElementById("icBack").files[0];
-
-if(!name||!phone||!icnumber){
-alert("Required fields missing");
-return;
-}
-
-let frontURL="";
-let backURL="";
-
-if(front){
-frontURL=await uploadFile(front,"ic/front_"+Date.now());
-}
-
-if(back){
-backURL=await uploadFile(back,"ic/back_"+Date.now());
-}
-
-await db.collection("submissions").add({
-
-name,
-phone,
-email,
-company,
-income,
-icnumber,
-loantype,
-amount,
-
-frontURL,
-backURL,
-
-status:"NEW",
-
-created:new Date()
-
-});
-
-alert("Application Submitted");
-
-location.reload();
-
-}
-
-</script>
-
-</body>
-</html>
