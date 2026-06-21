@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Admin V8 FIX</title>
+<title>LION CREDIT V8 ADMIN</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -13,85 +13,170 @@
 
 <style>
 
+/* ===== BODY ===== */
 body{
 margin:0;
 font-family:Arial;
-background:#0a0f1c;
-color:white;
 display:flex;
+background:url('hero-bg.jpg') no-repeat center/cover;
+color:white;
 }
 
+/* dark overlay */
+.overlay{
+position:fixed;
+top:0;left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.75);
+z-index:-1;
+}
+
+/* ===== SIDEBAR ===== */
 .sidebar{
-width:220px;
-background:#111827;
-padding:20px;
+width:240px;
 height:100vh;
+background:rgba(15,23,42,.95);
+padding:20px;
+backdrop-filter:blur(10px);
 }
 
+.logo{
+width:100%;
+text-align:center;
+margin-bottom:20px;
+}
+
+.logo img{
+width:80px;
+border-radius:12px;
+}
+
+.menu div{
+padding:12px;
+margin:8px 0;
+background:#111827;
+border-radius:8px;
+cursor:pointer;
+}
+
+.menu div:hover{
+background:#1f2937;
+}
+
+/* ===== MAIN ===== */
 .main{
 flex:1;
 padding:20px;
 }
 
-.card{
-background:#111827;
-padding:15px;
-border-radius:10px;
-margin-bottom:10px;
+/* ===== CARDS ===== */
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+margin-bottom:20px;
 }
 
+.card{
+background:rgba(17,24,39,.9);
+padding:15px;
+border-radius:12px;
+backdrop-filter:blur(10px);
+}
+
+/* ===== TABLE ===== */
 table{
 width:100%;
 border-collapse:collapse;
-background:#111827;
+background:rgba(17,24,39,.9);
+border-radius:10px;
+overflow:hidden;
 }
 
 th,td{
-padding:10px;
-border-bottom:1px solid #222;
+padding:12px;
 text-align:center;
+border-bottom:1px solid #1f2937;
 }
 
-button{
-padding:6px 10px;
-border:none;
-border-radius:5px;
+img{
+width:50px;
+border-radius:6px;
 cursor:pointer;
 }
 
-.approve{background:green;color:white;}
-.reject{background:red;color:white;}
+/* ===== BUTTONS ===== */
+button{
+padding:6px 10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
 
-img{width:50px;border-radius:5px;cursor:pointer;}
+.approve{background:#16a34a;color:white;}
+.reject{background:#dc2626;color:white;}
 
+/* ===== MODAL ===== */
 .modal{
 display:none;
 position:fixed;
 top:0;left:0;
-width:100%;height:100%;
-background:rgba(0,0,0,.8);
+width:100%;
+height:100%;
+background:rgba(0,0,0,.85);
 justify-content:center;
 align-items:center;
 }
 
-.modal img{max-width:80%;}
+.modal img{
+max-width:80%;
+border-radius:10px;
+}
+
+h1{
+margin-bottom:10px;
+}
 
 </style>
 </head>
 
 <body>
 
+<div class="overlay"></div>
+
+<!-- SIDEBAR -->
 <div class="sidebar">
-<h3>V8 BANK</h3>
+
+<div class="logo">
+<img src="logo.jpg">
+<h3>LION ADMIN</h3>
 </div>
 
+<div class="menu">
+<div onclick="load()">All Applications</div>
+<div onclick="filterStatus('Pending')">Pending</div>
+<div onclick="filterStatus('Approved')">Approved</div>
+<div onclick="filterStatus('Rejected')">Rejected</div>
+</div>
+
+</div>
+
+<!-- MAIN -->
 <div class="main">
 
-<div class="card">
-<h2>Applications</h2>
+<h1>📊 Applications Dashboard V8</h1>
+
+<div class="cards">
+<div class="card">Total: <span id="t"></span></div>
+<div class="card">Pending: <span id="p"></span></div>
+<div class="card">Approved: <span id="a"></span></div>
+<div class="card">Rejected: <span id="r"></span></div>
 </div>
 
 <canvas id="chart"></canvas>
+
+<br>
 
 <table>
 <thead>
@@ -101,21 +186,27 @@ align-items:center;
 <th>Amount</th>
 <th>Status</th>
 <th>Risk</th>
+<th>Front</th>
+<th>Back</th>
 <th>Action</th>
 </tr>
 </thead>
+
 <tbody id="tb"></tbody>
 </table>
 
 </div>
 
+<!-- MODAL -->
 <div class="modal" id="modal" onclick="this.style.display='none'">
-<img id="img">
+<img id="modalImg">
 </div>
 
 <script>
 
+let all=[];
 let chart;
+let statusFilter="all";
 
 auth.onAuthStateChanged(u=>{
 if(u) load();
@@ -127,41 +218,57 @@ const snap=await db.collection("applications")
 .orderBy("created","desc")
 .get();
 
-let data=[];
-snap.forEach(d=>data.push({id:d.id,...d.data()}));
+all=[];
+snap.forEach(d=>all.push({id:d.id,...d.data()}));
 
-render(data);
+render(all);
+}
+
+function filterStatus(s){
+statusFilter=s;
+render(all);
 }
 
 function render(data){
 
-let h="";
-let p=0,a=0,r=0;
+let t=0,p=0,a=0,r=0;
+
+let rows="";
 
 data.forEach(d=>{
 
+if(statusFilter!=="all" && d.status!==statusFilter) return;
+
+t++;
 if(d.status==="Pending")p++;
 if(d.status==="Approved")a++;
 if(d.status==="Rejected")r++;
 
-let risk=d.risk||0;
-
-h+=`
+rows+=`
 <tr>
 <td>${d.name||""}</td>
 <td>${d.phone||""}</td>
 <td>${d.amount||""}</td>
-<td>${d.status}</td>
-<td>${risk}</td>
+<td>${d.status||"Pending"}</td>
+<td>${d.risk||0}</td>
+
+<td><img src="${d.frontURL||''}" onclick="openImg('${d.frontURL}')"></td>
+<td><img src="${d.backURL||''}" onclick="openImg('${d.backURL}')"></td>
+
 <td>
-<button class="approve" onclick="update('${d.id}','Approved')">A</button>
-<button class="reject" onclick="update('${d.id}','Rejected')">R</button>
+<button class="approve" onclick="update('${d.id}','Approved')">✔</button>
+<button class="reject" onclick="update('${d.id}','Rejected')">✖</button>
 </td>
 </tr>
 `;
 });
 
-tb.innerHTML=h;
+tb.innerHTML=rows;
+
+document.getElementById("t").innerText=t;
+document.getElementById("p").innerText=p;
+document.getElementById("a").innerText=a;
+document.getElementById("r").innerText=r;
 
 draw(p,a,r);
 }
@@ -175,6 +282,11 @@ status
 load();
 }
 
+function openImg(src){
+document.getElementById("modal").style.display="flex";
+document.getElementById("modalImg").src=src;
+}
+
 function draw(p,a,r){
 
 if(chart) chart.destroy();
@@ -183,7 +295,9 @@ chart=new Chart(document.getElementById("chart"),{
 type:"bar",
 data:{
 labels:["Pending","Approved","Rejected"],
-datasets:[{data:[p,a,r]}]
+datasets:[{
+data:[p,a,r]
+}]
 }
 });
 
