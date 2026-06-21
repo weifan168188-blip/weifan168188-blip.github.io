@@ -2,62 +2,28 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>LION CREDIT SYSTEM</title>
+<title>Loan System V8</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#0b0f19;
-color:white;
-}
-
-.container{
-max-width:700px;
-margin:50px auto;
-padding:30px;
-background:#141b2d;
-border-radius:20px;
-}
-
-input,select{
-width:100%;
-padding:12px;
-margin:8px 0;
-border:none;
-border-radius:10px;
-}
-
-button{
-width:100%;
-padding:15px;
-background:#00c853;
-border:none;
-color:white;
-border-radius:10px;
-cursor:pointer;
-}
-
-button:hover{opacity:.9;}
+body{margin:0;font-family:Arial;background:#0b0f19;color:white;}
+.container{max-width:700px;margin:40px auto;padding:30px;background:#141b2d;border-radius:15px;}
+input,select{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:none;}
+button{width:100%;padding:14px;background:#00c853;border:none;color:white;border-radius:8px;}
 </style>
 </head>
 
 <body>
 
 <div class="container">
+<h2>Loan Application V8</h2>
 
-<h2>Loan Application</h2>
-
-<input id="name" placeholder="Full Name">
-<input id="phone" placeholder="Phone Number">
-<input id="email" placeholder="Email">
-<input id="company" placeholder="Company">
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Phone">
 <input id="income" placeholder="Income">
-<input id="icnumber" placeholder="IC Number">
 
-<select id="loantype">
-<option>Personal Loan</option>
-<option>Business Loan</option>
+<select id="type">
+<option>Personal</option>
+<option>Business</option>
 </select>
 
 <select id="amount">
@@ -66,92 +32,49 @@ button:hover{opacity:.9;}
 <option>10000</option>
 </select>
 
-<label>IC Front</label>
-<input type="file" id="icFront">
-
-<label>IC Back</label>
-<input type="file" id="icBack">
-
-<button onclick="submitForm()">Submit</button>
-
+<button onclick="submit()">Submit</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="firebase.js"></script>
 
 <script>
 
-function fileToBase64(file){
-return new Promise((res,rej)=>{
-const r=new FileReader();
-r.onload=()=>res(r.result);
-r.onerror=rej;
-r.readAsDataURL(file);
-});
+let lock=false;
+
+function riskScore(data){
+
+let score=0;
+if(data.amount>5000) score+=30;
+if(data.type==="Business") score+=20;
+if(data.income<3000) score+=30;
+
+return score;
 }
 
-let isSubmitting=false;
+async function submit(){
 
-async function submitForm(){
+if(lock) return;
+lock=true;
 
-if(isSubmitting) return;
-isSubmitting=true;
-
-try{
-
-const name=nameInput("name");
-const phone=nameInput("phone");
-const icnumber=nameInput("icnumber");
-
-if(!name||!phone||!icnumber){
-alert("Fill required fields");
-isSubmitting=false;
-return;
-}
-
-const front=document.getElementById("icFront").files[0];
-const back=document.getElementById("icBack").files[0];
-
-let frontURL="",backURL="";
-
-if(front) frontURL=await fileToBase64(front);
-if(back) backURL=await fileToBase64(back);
-
-await db.collection("applications").add({
-
-name,
-phone,
-email:nameInput("email"),
-company:nameInput("company"),
-income:nameInput("income"),
-icnumber,
-
-loantype:document.getElementById("loantype").value,
-amount:document.getElementById("amount").value,
-
-frontURL,
-backURL,
-
+const data={
+name: name.value,
+phone: phone.value,
+income: income.value,
+type: type.value,
+amount: amount.value,
 status:"Pending",
-
 created:firebase.firestore.FieldValue.serverTimestamp()
+};
 
-});
+data.risk=riskScore(data);
+
+await db.collection("applications").add(data);
 
 alert("Submitted");
-location.reload();
 
-}catch(e){
-alert(e.message);
-}
-
-isSubmitting=false;
-}
-
-function nameInput(id){
-return document.getElementById(id).value.trim();
+lock=false;
 }
 
 </script>
