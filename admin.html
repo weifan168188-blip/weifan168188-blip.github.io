@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Admin Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LION CREDIT ADMIN</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -13,198 +14,341 @@
 <style>
 
 body{
-background:#0b0f19;
-color:white;
+margin:0;
 font-family:Arial;
-padding:20px;
+background:#0a0a0a;
+color:white;
+display:flex;
 }
 
-.card{
-background:#141b2d;
+/* LEFT MENU */
+.sidebar{
+width:220px;
+background:#111;
+min-height:100vh;
 padding:20px;
-border-radius:15px;
+border-right:1px solid #222;
+}
+
+.sidebar h2{
+color:#d4af37;
 margin-bottom:20px;
 }
 
-input{
+.menu{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.menu button{
+background:#1a1a1a;
+color:white;
+border:none;
 padding:12px;
-margin:5px;
-width:300px;
-border:none;
-border-radius:8px;
-}
-
-button{
-padding:10px 15px;
+border-radius:10px;
 cursor:pointer;
-border:none;
-border-radius:8px;
+text-align:left;
 }
 
-table{
-width:100%;
-margin-top:20px;
-border-collapse:collapse;
+.menu button:hover{
+background:#222;
 }
 
-th,td{
+/* MAIN */
+.main{
+flex:1;
+padding:20px;
+}
+
+/* LOGIN */
+#loginBox{
+max-width:400px;
+margin:120px auto;
+background:#111;
+padding:30px;
+border-radius:15px;
 border:1px solid #333;
-padding:10px;
 text-align:center;
 }
 
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+background:#1a1a1a;
+border:1px solid #333;
+color:white;
+border-radius:10px;
+}
+
+button{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:linear-gradient(90deg,#b8860b,#d4af37,#f5d76e);
+color:black;
+font-weight:bold;
+}
+
+button:hover{opacity:.9}
+
+/* STATS */
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:15px;
+margin-bottom:20px;
+}
+
+.card{
+background:#111;
+padding:15px;
+border-radius:12px;
+border:1px solid #222;
+}
+
+.card h3{
+color:#d4af37;
+margin:0;
+font-size:26px;
+}
+
+/* TABLE */
+table{
+width:100%;
+border-collapse:collapse;
+background:#111;
+border-radius:12px;
+overflow:hidden;
+}
+
+th{
+background:#1b1b1b;
+color:#d4af37;
+padding:12px;
+}
+
+td{
+padding:10px;
+border-top:1px solid #222;
+text-align:center;
+}
+
+tr:hover{
+background:#1a1a1a;
+}
+
+.status{
+padding:5px 10px;
+border-radius:8px;
+font-size:12px;
+}
+
+.pending{background:#ffb300;color:black;}
+.approved{background:#00c853;color:black;}
+.rejected{background:#d50000;color:white;}
+
 img{
-width:120px;
+width:70px;
+border-radius:8px;
+cursor:pointer;
+border:1px solid #333;
+}
+
+/* MODAL */
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal img{
+width:400px;
 border-radius:10px;
 }
 
 </style>
-
 </head>
+
 <body>
 
-<div id="loginBox" class="card">
-
+<!-- LOGIN -->
+<div id="loginBox">
 <h2>🔐 Admin Login</h2>
-
-<input id="email" placeholder="Admin Email">
-
+<input id="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
-
-<br>
-
 <button onclick="login()">Login</button>
-
 </div>
 
-<div id="panel" style="display:none;">
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar" style="display:none;">
+<h2>LION ADMIN</h2>
+
+<div class="menu">
+<button onclick="loadData()">📋 Dashboard</button>
+<button onclick="loadData()">📄 Applications</button>
+<button onclick="logout()">🚪 Logout</button>
+</div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="panel" style="display:none;">
+
+<div class="stats">
+<div class="card">
+<h3 id="total">0</h3>
+<p>Total</p>
+</div>
 
 <div class="card">
-
-<h2>📋 Loan Applications</h2>
-
-<button onclick="loadData()">Refresh</button>
-
-<button onclick="logout()">Logout</button>
-
+<h3 id="pending">0</h3>
+<p>Pending</p>
 </div>
 
+<div class="card">
+<h3 id="approved">0</h3>
+<p>Approved</p>
+</div>
+
+<div class="card">
+<h3 id="rejected">0</h3>
+<p>Rejected</p>
+</div>
+</div>
+
+<input id="search" placeholder="Search name or phone..." onkeyup="loadData()">
+
 <table>
-
 <thead>
-
 <tr>
 <th>Name</th>
 <th>Phone</th>
 <th>Loan</th>
 <th>Amount</th>
+<th>Status</th>
 <th>IC Front</th>
 <th>IC Back</th>
-<th>Delete</th>
+<th>Action</th>
 </tr>
-
 </thead>
 
 <tbody id="tableBody"></tbody>
-
 </table>
 
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal" onclick="closeModal()">
+<img id="modalImg">
 </div>
 
 <script>
 
 auth.onAuthStateChanged(user=>{
-
 if(user){
-
-document.getElementById("panel").style.display="block";
 document.getElementById("loginBox").style.display="none";
-
+document.getElementById("sidebar").style.display="block";
+document.getElementById("panel").style.display="block";
 loadData();
-
 }
-
 });
 
 async function login(){
-
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
-
 try{
-
-await auth.signInWithEmailAndPassword(email,password);
-
+await auth.signInWithEmailAndPassword(
+email.value,
+password.value
+);
 }catch(e){
-
 alert(e.message);
-
 }
-
 }
 
 function logout(){
-
 auth.signOut();
-
 location.reload();
+}
 
+function showImg(url){
+document.getElementById("modal").style.display="flex";
+document.getElementById("modalImg").src=url;
+}
+
+function closeModal(){
+document.getElementById("modal").style.display="none";
 }
 
 async function loadData(){
 
 tableBody.innerHTML="";
 
-const snapshot=await db.collection("submissions").get();
+let snapshot=await db.collection("submissions").orderBy("created","desc").get();
+
+let total=0,pending=0,approved=0,rejected=0;
+
+let keyword=document.getElementById("search").value?.toLowerCase() || "";
 
 snapshot.forEach(doc=>{
 
-const d=doc.data();
+let d=doc.data();
+
+if(keyword &&
+!(d.name?.toLowerCase().includes(keyword) ||
+d.phone?.includes(keyword))) return;
+
+total++;
+
+if(d.status=="Pending") pending++;
+if(d.status=="Approved") approved++;
+if(d.status=="Rejected") rejected++;
 
 tableBody.innerHTML+=`
-
 <tr>
 
 <td>${d.name || ""}</td>
-
 <td>${d.phone || ""}</td>
-
 <td>${d.loantype || ""}</td>
-
 <td>${d.amount || ""}</td>
 
 <td>
-${d.frontURL ? `<a href="${d.frontURL}" target="_blank"><img src="${d.frontURL}"></a>` : ""}
+<span class="status ${d.status?.toLowerCase()}">
+${d.status || "Pending"}
+</span>
 </td>
 
 <td>
-${d.backURL ? `<a href="${d.backURL}" target="_blank"><img src="${d.backURL}"></a>` : ""}
+${d.frontURL ? `<img onclick="showImg('${d.frontURL}')" src="${d.frontURL}">` : ""}
 </td>
 
 <td>
-<button onclick="deleteRecord('${doc.id}')">
-Delete
-</button>
+${d.backURL ? `<img onclick="showImg('${d.backURL}')" src="${d.backURL}">` : ""}
+</td>
+
+<td>
+<button onclick="deleteRecord('${doc.id}')">Delete</button>
 </td>
 
 </tr>
-
 `;
-
 });
 
+document.getElementById("total").innerText=total;
+document.getElementById("pending").innerText=pending;
+document.getElementById("approved").innerText=approved;
+document.getElementById("rejected").innerText=rejected;
 }
 
 async function deleteRecord(id){
-
 if(confirm("Delete record?")){
-
 await db.collection("submissions").doc(id).delete();
-
 loadData();
-
 }
-
 }
 
 </script>
