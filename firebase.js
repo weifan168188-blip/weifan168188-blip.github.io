@@ -1,4 +1,5 @@
-// Firebase CDN
+// Firebase Config
+
 const firebaseConfig = {
   apiKey: "AIzaSyA394LWxxX3_mjiiKQU5GIWTGrWSHmCVfU",
   authDomain: "lion-credit-system.firebaseapp.com",
@@ -10,5 +11,5 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
-const auth = firebase.auth();
+window.db = firebase.firestore();
+window.auth = firebase.auth();
