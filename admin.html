@@ -2,288 +2,128 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>LION CREDIT V7 BANK GRADE</title>
+<title>Admin Dashboard</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="firebase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<script src="firebase.js"></script>
+
 <style>
-
-body{
-margin:0;
-font-family:Arial;
-background:#0a0f1c;
-color:white;
-display:flex;
-}
-
-/* SIDEBAR */
-.sidebar{
-width:240px;
-height:100vh;
-background:#0f172a;
-padding:20px;
-}
-
-.sidebar h2{
-color:#f5c542;
-}
-
-.menu div{
-padding:12px;
-margin:8px 0;
-border-radius:8px;
-cursor:pointer;
-background:#111827;
-}
-
-.menu div:hover{
-background:#1f2937;
-}
-
-/* MAIN */
-.main{
-flex:1;
-padding:20px;
-}
-
-.cards{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px;
-margin-bottom:20px;
-}
-
-.card{
-background:#111827;
-padding:15px;
-border-radius:12px;
-}
-
-#search{
-width:300px;
-padding:10px;
-border:none;
-border-radius:8px;
-margin-bottom:10px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-background:#111827;
-border-radius:10px;
-overflow:hidden;
-}
-
-th,td{
-padding:12px;
-text-align:center;
-border-bottom:1px solid #1f2937;
-}
-
-img{
-width:60px;
-border-radius:6px;
-cursor:pointer;
-}
-
-button{
-padding:6px 10px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-margin:2px;
-}
-
-.approve{background:#16a34a;color:white;}
-.reject{background:#dc2626;color:white;}
-.delete{background:#374151;color:white;}
-
-.modal{
-display:none;
-position:fixed;
-top:0;left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,.8);
-justify-content:center;
-align-items:center;
-}
-
-.modal img{
-max-width:80%;
-border-radius:10px;
-}
-
+body{background:#0a0f1c;color:white;font-family:Arial;margin:0;display:flex;}
+.sidebar{width:200px;background:#111827;height:100vh;padding:20px;}
+.main{flex:1;padding:20px;}
+.card{background:#111827;padding:15px;border-radius:10px;margin-bottom:10px;}
+table{width:100%;border-collapse:collapse;background:#111827;}
+td,th{padding:10px;border-bottom:1px solid #222;text-align:center;}
+button{padding:6px;border:none;border-radius:5px;cursor:pointer;}
+.approve{background:green;color:white;}
+.reject{background:red;color:white;}
+.delete{background:gray;color:white;}
+img{width:60px;border-radius:6px;}
 </style>
 </head>
 
 <body>
 
 <div class="sidebar">
-<h2>🦁 LION V7</h2>
-
-<div class="menu">
-<div onclick="filter('all')">All</div>
-<div onclick="filter('Pending')">Pending</div>
-<div onclick="filter('Approved')">Approved</div>
-<div onclick="filter('Rejected')">Rejected</div>
-</div>
+<h3>Admin</h3>
 </div>
 
 <div class="main">
 
-<h1>Bank Admin Dashboard V7</h1>
-
-<div class="cards">
-<div class="card">Total: <span id="total">0</span></div>
-<div class="card">Pending: <span id="pending">0</span></div>
-<div class="card">Approved: <span id="approved">0</span></div>
-<div class="card">Rejected: <span id="rejected">0</span></div>
+<div class="card">
+<h2>Applications</h2>
 </div>
 
-<input id="search" placeholder="Search..." onkeyup="render()">
-
 <canvas id="chart"></canvas>
-
-<br><br>
 
 <table>
 <thead>
 <tr>
 <th>Name</th>
 <th>Phone</th>
-<th>Loan</th>
 <th>Amount</th>
 <th>Status</th>
-<th>IC Front</th>
-<th>IC Back</th>
 <th>Action</th>
 </tr>
 </thead>
 
-<tbody id="tableBody"></tbody>
+<tbody id="table"></tbody>
 </table>
 
 </div>
 
-<div class="modal" id="modal" onclick="closeModal()">
-<img id="modalImg">
-</div>
-
 <script>
 
-let allData = [];
-let filterType = "all";
-let chart = null;
+let all=[];
+let chart=null;
 
-auth.onAuthStateChanged(user=>{
-if(user) load();
+auth.onAuthStateChanged(u=>{
+if(u) load();
 });
 
 async function load(){
 
-const snap = await db.collection("applications")
+const snap=await db.collection("applications")
 .orderBy("created","desc")
 .get();
 
-allData = [];
-snap.forEach(d=>{
-allData.push({id:d.id,...d.data()});
-});
+all=[];
+snap.forEach(d=>all.push({id:d.id,...d.data()}));
 
 render();
 }
 
 function render(){
 
-let q = document.getElementById("search").value.toLowerCase();
-
-let data = allData.filter(d=>{
-let matchFilter = filterType==="all" || d.status===filterType;
-
-let matchSearch =
-(d.name||"").toLowerCase().includes(q) ||
-(d.phone||"").toLowerCase().includes(q);
-
-return matchFilter && matchSearch;
-});
-
-let html = "";
-
 let p=0,a=0,r=0;
+let html="";
 
-data.forEach(d=>{
+all.forEach(d=>{
 
-if(d.status==="Pending")p++;
-if(d.status==="Approved")a++;
-if(d.status==="Rejected")r++;
+if(d.status=="Pending")p++;
+if(d.status=="Approved")a++;
+if(d.status=="Rejected")r++;
 
-html += `
+html+=`
 <tr>
 <td>${d.name||""}</td>
 <td>${d.phone||""}</td>
-<td>${d.loantype||""}</td>
 <td>${d.amount||""}</td>
-<td>${d.status||"Pending"}</td>
-
-<td>${d.frontURL?`<img src="${d.frontURL}" onclick="openImg('${d.frontURL}')">`:""}</td>
-<td>${d.backURL?`<img src="${d.backURL}" onclick="openImg('${d.backURL}')">`:""}</td>
+<td>${d.status||""}</td>
 
 <td>
-<button class="approve" onclick="update('${d.id}','Approved')">A</button>
-<button class="reject" onclick="update('${d.id}','Rejected')">R</button>
+<button class="approve" onclick="setStatus('${d.id}','Approved')">A</button>
+<button class="reject" onclick="setStatus('${d.id}','Rejected')">R</button>
 <button class="delete" onclick="del('${d.id}')">X</button>
 </td>
 </tr>
 `;
 });
 
-document.getElementById("tableBody").innerHTML = html;
-
-document.getElementById("total").innerText = data.length;
-document.getElementById("pending").innerText = p;
-document.getElementById("approved").innerText = a;
-document.getElementById("rejected").innerText = r;
+document.getElementById("table").innerHTML=html;
 
 draw(p,a,r);
 }
 
-function filter(t){
-filterType = t;
-render();
-}
-
-function update(id,status){
-db.collection("applications").doc(id).update({
-status: status
-});
+async function setStatus(id,status){
+await db.collection("applications").doc(id).update({status});
 load();
 }
 
-function del(id){
-db.collection("applications").doc(id).delete();
+async function del(id){
+await db.collection("applications").doc(id).delete();
 load();
 }
 
-function openImg(src){
-document.getElementById("modal").style.display="flex";
-document.getElementById("modalImg").src=src;
-}
-
-function closeModal(){
-document.getElementById("modal").style.display="none";
-}
-
-function draw(p=0,a=0,r=0){
+function draw(p,a,r){
 
 if(chart) chart.destroy();
 
-chart = new Chart(document.getElementById("chart"),{
+chart=new Chart(document.getElementById("chart"),{
 type:"bar",
 data:{
 labels:["Pending","Approved","Rejected"],
@@ -292,6 +132,7 @@ data:[p,a,r]
 }]
 }
 });
+
 }
 
 </script>
