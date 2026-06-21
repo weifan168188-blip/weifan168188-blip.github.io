@@ -1,15 +1,13 @@
-// Firebase Config
-
 const firebaseConfig = {
-  apiKey: "AIzaSyA394LWxxX3_mjiiKQU5GIWTGrWSHmCVfU",
-  authDomain: "lion-credit-system.firebaseapp.com",
-  projectId: "lion-credit-system",
-  storageBucket: "lion-credit-system.firebasestorage.app",
-  messagingSenderId: "720399842142",
-  appId: "1:720399842142:web:b2635c6228553c28eaedcf"
+apiKey: "YOUR_KEY",
+authDomain: "YOUR_DOMAIN",
+projectId: "YOUR_PROJECT_ID",
+storageBucket: "YOUR_BUCKET",
+messagingSenderId: "YOUR_ID",
+appId: "YOUR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
 
-window.db = firebase.firestore();
-window.auth = firebase.auth();
+const db = firebase.firestore();
+const auth = firebase.auth();
