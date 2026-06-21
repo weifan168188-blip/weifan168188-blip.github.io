@@ -190,7 +190,7 @@ if(user) load();
 });
 
 async function load(){
-const snap=await db.collection("submissions").orderBy("created","desc").get();
+const snap=await db.collection("applications").add({.orderBy("created","desc").get();
 allData=[];
 snap.forEach(d=>allData.push({id:d.id,...d.data()}));
 render();
@@ -258,12 +258,12 @@ render();
 }
 
 function update(id,status){
-db.collection("submissions").doc(id).update({status});
+db.collection("applications").add({.doc(id).update({status});
 load();
 }
 
 function del(id){
-db.collection("submissions").doc(id).delete();
+db.collection("applications").add({.doc(id).delete();
 load();
 }
 
