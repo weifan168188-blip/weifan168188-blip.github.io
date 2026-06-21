@@ -7,7 +7,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
 <script src="firebase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -51,7 +50,6 @@ flex:1;
 padding:20px;
 }
 
-/* TOP CARDS */
 .cards{
 display:grid;
 grid-template-columns:repeat(4,1fr);
@@ -65,7 +63,6 @@ padding:15px;
 border-radius:12px;
 }
 
-/* SEARCH */
 #search{
 width:300px;
 padding:10px;
@@ -74,7 +71,6 @@ border-radius:8px;
 margin-bottom:10px;
 }
 
-/* TABLE */
 table{
 width:100%;
 border-collapse:collapse;
@@ -107,7 +103,6 @@ margin:2px;
 .reject{background:#dc2626;color:white;}
 .delete{background:#374151;color:white;}
 
-/* MODAL */
 .modal{
 display:none;
 position:fixed;
@@ -145,10 +140,10 @@ border-radius:10px;
 <h1>Bank Admin Dashboard V7</h1>
 
 <div class="cards">
-<div class="card">Total: <span id="total"></span></div>
-<div class="card">Pending: <span id="pending"></span></div>
-<div class="card">Approved: <span id="approved"></span></div>
-<div class="card">Rejected: <span id="rejected"></span></div>
+<div class="card">Total: <span id="total">0</span></div>
+<div class="card">Pending: <span id="pending">0</span></div>
+<div class="card">Approved: <span id="approved">0</span></div>
+<div class="card">Rejected: <span id="rejected">0</span></div>
 </div>
 
 <input id="search" placeholder="Search..." onkeyup="render()">
@@ -182,37 +177,43 @@ border-radius:10px;
 
 <script>
 
-let allData=[];
-let filterType="all";
+let allData = [];
+let filterType = "all";
+let chart = null;
 
 auth.onAuthStateChanged(user=>{
 if(user) load();
 });
 
 async function load(){
-const snap=await db.collection("applications").add({.orderBy("created","desc").get();
-allData=[];
-snap.forEach(d=>allData.push({id:d.id,...d.data()}));
+
+const snap = await db.collection("applications")
+.orderBy("created","desc")
+.get();
+
+allData = [];
+snap.forEach(d=>{
+allData.push({id:d.id,...d.data()});
+});
+
 render();
-draw();
 }
 
 function render(){
 
-let q=document.getElementById("search").value.toLowerCase();
+let q = document.getElementById("search").value.toLowerCase();
 
-let data=allData.filter(d=>{
+let data = allData.filter(d=>{
+let matchFilter = filterType==="all" || d.status===filterType;
 
-let matchFilter=filterType==="all"||d.status===filterType;
-
-let matchSearch=
-(d.name||"").toLowerCase().includes(q)||
+let matchSearch =
+(d.name||"").toLowerCase().includes(q) ||
 (d.phone||"").toLowerCase().includes(q);
 
-return matchFilter&&matchSearch;
+return matchFilter && matchSearch;
 });
 
-let html="";
+let html = "";
 
 let p=0,a=0,r=0;
 
@@ -222,7 +223,7 @@ if(d.status==="Pending")p++;
 if(d.status==="Approved")a++;
 if(d.status==="Rejected")r++;
 
-html+=`
+html += `
 <tr>
 <td>${d.name||""}</td>
 <td>${d.phone||""}</td>
@@ -230,8 +231,8 @@ html+=`
 <td>${d.amount||""}</td>
 <td>${d.status||"Pending"}</td>
 
-<td><img src="${d.frontURL||''}" onclick="openImg('${d.frontURL}')"></td>
-<td><img src="${d.backURL||''}" onclick="openImg('${d.backURL}')"></td>
+<td>${d.frontURL?`<img src="${d.frontURL}" onclick="openImg('${d.frontURL}')">`:""}</td>
+<td>${d.backURL?`<img src="${d.backURL}" onclick="openImg('${d.backURL}')">`:""}</td>
 
 <td>
 <button class="approve" onclick="update('${d.id}','Approved')">A</button>
@@ -242,28 +243,30 @@ html+=`
 `;
 });
 
-document.getElementById("tableBody").innerHTML=html;
+document.getElementById("tableBody").innerHTML = html;
 
-document.getElementById("total").innerText=data.length;
-document.getElementById("pending").innerText=p;
-document.getElementById("approved").innerText=a;
-document.getElementById("rejected").innerText=r;
+document.getElementById("total").innerText = data.length;
+document.getElementById("pending").innerText = p;
+document.getElementById("approved").innerText = a;
+document.getElementById("rejected").innerText = r;
 
 draw(p,a,r);
 }
 
 function filter(t){
-filterType=t;
+filterType = t;
 render();
 }
 
 function update(id,status){
-db.collection("applications").add({.doc(id).update({status});
+db.collection("applications").doc(id).update({
+status: status
+});
 load();
 }
 
 function del(id){
-db.collection("applications").add({.doc(id).delete();
+db.collection("applications").doc(id).delete();
 load();
 }
 
@@ -277,7 +280,10 @@ document.getElementById("modal").style.display="none";
 }
 
 function draw(p=0,a=0,r=0){
-new Chart(document.getElementById("chart"),{
+
+if(chart) chart.destroy();
+
+chart = new Chart(document.getElementById("chart"),{
 type:"bar",
 data:{
 labels:["Pending","Approved","Rejected"],
