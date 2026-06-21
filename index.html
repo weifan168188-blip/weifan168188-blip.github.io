@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>LION CREDIT SYSTEM V8 ENTERPRISE</title>
+<title>LION CREDIT SYSTEM V8</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -11,103 +11,48 @@
 <script src="firebase.js"></script>
 
 <style>
-
-/* ===== GLOBAL ===== */
 body{
 margin:0;
 font-family:Arial;
+background:url('hero-bg.jpg') no-repeat center/cover;
 color:white;
-background:url('hero-bg.jpg') no-repeat center center fixed;
-background-size:cover;
 }
 
-/* DARK OVERLAY */
 .overlay{
+background:rgba(0,0,0,.7);
 min-height:100vh;
-background:rgba(0,0,0,.72);
 display:flex;
 justify-content:center;
 align-items:center;
-padding:40px;
 }
 
-/* CARD */
 .container{
-width:460px;
-background:rgba(15,23,42,.95);
-border-radius:18px;
-padding:30px;
-box-shadow:0 0 40px rgba(0,0,0,.6);
-backdrop-filter:blur(10px);
-animation:fadeIn .6s ease;
+width:420px;
+background:#111827;
+padding:25px;
+border-radius:15px;
+box-shadow:0 0 20px rgba(0,0,0,.5);
 }
 
-/* TITLE */
-h1{
-text-align:center;
-margin-bottom:25px;
-font-size:24px;
-letter-spacing:1px;
-}
+h1{text-align:center;color:#f5c542}
 
-/* INPUTS */
 input,select{
 width:100%;
-padding:12px;
-margin:8px 0;
+padding:10px;
+margin:6px 0;
 border:none;
-border-radius:10px;
-outline:none;
-background:#1f2937;
-color:white;
+border-radius:8px;
 }
 
-input::placeholder{
-color:#aaa;
-}
-
-/* LABEL */
-label{
-font-size:13px;
-opacity:.8;
-margin-top:8px;
-display:block;
-}
-
-/* BUTTON */
 button{
 width:100%;
-padding:14px;
-margin-top:15px;
+padding:12px;
+background:#22c55e;
 border:none;
-border-radius:10px;
-background:linear-gradient(90deg,#00c853,#00e676);
 color:white;
-font-size:16px;
+border-radius:10px;
 cursor:pointer;
-transition:.2s;
 }
-
-button:hover{
-transform:scale(1.02);
-opacity:.9;
-}
-
-/* FOOTER */
-small{
-display:block;
-text-align:center;
-margin-top:10px;
-opacity:.6;
-font-size:12px;
-}
-
-/* ANIMATION */
-@keyframes fadeIn{
-from{opacity:0;transform:translateY(20px);}
-to{opacity:1;transform:translateY(0);}
-}
-
 </style>
 </head>
 
@@ -117,50 +62,34 @@ to{opacity:1;transform:translateY(0);}
 
 <div class="container">
 
-<h1>🦁 LION CREDIT SYSTEM</h1>
+<h1>🦁 LION CREDIT</h1>
 
-<label>Full Name</label>
-<input id="name" placeholder="Enter full name">
-
-<label>Phone Number</label>
-<input id="phone" placeholder="Enter phone">
-
-<label>Email</label>
-<input id="email" placeholder="Enter email">
-
-<label>Company</label>
-<input id="company" placeholder="Company name">
-
-<label>Monthly Income</label>
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Phone">
+<input id="email" placeholder="Email">
+<input id="company" placeholder="Company">
 <input id="income" placeholder="Income">
+<input id="icnumber" placeholder="IC Number">
 
-<label>IC Number</label>
-<input id="icnumber" placeholder="NRIC / ID">
-
-<label>Loan Type</label>
 <select id="loantype">
 <option>Personal Loan</option>
 <option>Business Loan</option>
 </select>
 
-<label>Loan Amount</label>
 <select id="amount">
 <option>1000</option>
 <option>5000</option>
 <option>10000</option>
 <option>20000</option>
-<option>50000</option>
 </select>
 
 <label>IC Front</label>
-<input type="file" id="icFront">
+<input type="file" id="front">
 
 <label>IC Back</label>
-<input type="file" id="icBack">
+<input type="file" id="back">
 
-<button onclick="submitForm()">Submit Application</button>
-
-<small>Secure Banking System • Powered by Firebase</small>
+<button onclick="submit()">SUBMIT</button>
 
 </div>
 
@@ -168,8 +97,7 @@ to{opacity:1;transform:translateY(0);}
 
 <script>
 
-/* ===== BASE64 FILE ===== */
-function fileToBase64(file){
+function toBase64(file){
 return new Promise((res,rej)=>{
 const r=new FileReader();
 r.onload=()=>res(r.result);
@@ -178,32 +106,43 @@ r.readAsDataURL(file);
 });
 }
 
-/* ===== SUBMIT ===== */
-async function submitForm(){
+async function submit(){
 
-const front=document.getElementById("icFront").files[0];
-const back=document.getElementById("icBack").files[0];
+const name=document.getElementById("name").value;
+const phone=document.getElementById("phone").value;
+const ic=document.getElementById("icnumber").value;
+
+if(!name || !phone || !ic){
+alert("Fill required fields");
+return;
+}
+
+let front=document.getElementById("front").files[0];
+let back=document.getElementById("back").files[0];
+
+let frontURL=front?await toBase64(front):"";
+let backURL=back?await toBase64(back):"";
 
 await db.collection("applications").add({
-
-name:document.getElementById("name").value,
-phone:document.getElementById("phone").value,
+name,
+phone,
 email:document.getElementById("email").value,
 company:document.getElementById("company").value,
 income:document.getElementById("income").value,
-icnumber:document.getElementById("icnumber").value,
+icnumber:ic,
 loantype:document.getElementById("loantype").value,
 amount:document.getElementById("amount").value,
 
-frontURL: front ? await fileToBase64(front) : "",
-backURL: back ? await fileToBase64(back) : "",
+frontURL,
+backURL,
 
 status:"Pending",
-created:new Date()
+risk:Math.floor(Math.random()*100),
 
+created:new Date()
 });
 
-alert("Application Submitted Successfully");
+alert("Submitted!");
 location.reload();
 }
 
