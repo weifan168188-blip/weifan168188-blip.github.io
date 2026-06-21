@@ -1,110 +1,190 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard</title>
-  <style>
-    body{font-family:Arial;background:#0b0f19;color:white;padding:20px;}
-    input,button{padding:10px;margin:5px;width:300px;}
-    table{width:100%;margin-top:20px;border-collapse:collapse;}
-    td,th{border:1px solid #333;padding:8px;}
-    .box{display:none;}
-  </style>
+<meta charset="utf-8">
+
+<title>Admin Dashboard</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script src="firebase.js"></script>
+
+<style>
+
+body{
+background:#0b0f19;
+color:white;
+font-family:Arial;
+padding:20px;
+}
+
+input{
+padding:10px;
+margin:5px;
+width:300px;
+}
+
+button{
+padding:10px;
+cursor:pointer;
+}
+
+table{
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+}
+
+td,th{
+border:1px solid #333;
+padding:10px;
+}
+
+img{
+width:100px;
+border-radius:10px;
+}
+
+</style>
 </head>
 <body>
 
 <h2>🔐 Admin Login</h2>
 
 <div id="loginBox">
-  <input id="email" placeholder="Email"><br>
-  <input id="password" type="password" placeholder="Password"><br>
-  <button onclick="login()">Login</button>
-</div>
 
-<div id="panel" class="box">
+<input id="email" placeholder="Admin Email">
 
-  <h2>📊 Submissions</h2>
-  <button onclick="loadData()">Refresh</button>
-  <button onclick="logout()">Logout</button>
+<input id="password" type="password" placeholder="Password">
 
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Company</th>
-        <th>Amount</th>
-        <th>IC</th>
-        <th>IC Front</th>
-        <th>IC Back</th>
-      </tr>
-    </thead>
-    <tbody id="data"></tbody>
-  </table>
+<button onclick="login()">Login</button>
 
 </div>
 
-<script type="module">
-import { auth, db } from "./firebase.js";
-import {
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+<div id="panel" style="display:none;">
 
-import {
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<h2>📋 Loan Submissions</h2>
 
-window.login = async function(){
-  await signInWithEmailAndPassword(
-    auth,
-    email.value,
-    password.value
-  );
-  alert("Login success");
+<button onclick="loadData()">Refresh</button>
+
+<button onclick="logout()">Logout</button>
+
+<table>
+
+<thead>
+<tr>
+<th>Name</th>
+<th>Phone</th>
+<th>Loan</th>
+<th>Amount</th>
+<th>IC Front</th>
+<th>IC Back</th>
+<th>Delete</th>
+</tr>
+</thead>
+
+<tbody id="tableBody"></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+auth.onAuthStateChanged(user=>{
+
+if(user){
+
+panel.style.display="block";
+loginBox.style.display="none";
+
+loadData();
+
 }
 
-window.logout = async function(){
-  await signOut(auth);
-}
-
-onAuthStateChanged(auth, user=>{
-  if(user){
-    loginBox.style.display="none";
-    panel.style.display="block";
-    loadData();
-  } else {
-    loginBox.style.display="block";
-    panel.style.display="none";
-  }
 });
 
-window.loadData = async function(){
-  const snap = await getDocs(collection(db,"applications"));
-  let html="";
+async function login(){
 
-  snap.forEach(doc=>{
-    const d = doc.data();
+const email=document.getElementById("email").value;
+const password=document.getElementById("password").value;
 
-    html += `
-      <tr>
-        <td>${d.name||""}</td>
-        <td>${d.email||""}</td>
-        <td>${d.phone||""}</td>
-        <td>${d.company||""}</td>
-        <td>${d.amount||""}</td>
-        <td>${d.ic_number||""}</td>
-        <td><a href="${d.ic_front}" target="_blank">View</a></td>
-        <td><a href="${d.ic_back}" target="_blank">View</a></td>
-      </tr>
-    `;
-  });
+await auth.signInWithEmailAndPassword(email,password);
 
-  data.innerHTML = html;
 }
+
+function logout(){
+
+auth.signOut();
+
+location.reload();
+
+}
+
+async function loadData(){
+
+tableBody.innerHTML="";
+
+const snapshot=await db.collection("submissions")
+.orderBy("created","desc")
+.get();
+
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+tableBody.innerHTML+=`
+
+<tr>
+
+<td>${d.name}</td>
+
+<td>${d.phone}</td>
+
+<td>${d.loantype}</td>
+
+<td>${d.amount}</td>
+
+<td>
+<a href="${d.frontURL}" target="_blank">
+<img src="${d.frontURL}">
+</a>
+</td>
+
+<td>
+<a href="${d.backURL}" target="_blank">
+<img src="${d.backURL}">
+</a>
+</td>
+
+<td>
+<button onclick="deleteRecord('${doc.id}')">
+Delete
+</button>
+</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+async function deleteRecord(id){
+
+if(confirm("Delete record?")){
+
+await db.collection("submissions").doc(id).delete();
+
+loadData();
+
+}
+
+}
+
 </script>
 
 </body>
