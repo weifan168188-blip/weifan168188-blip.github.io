@@ -2,8 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LION CREDIT ADMIN</title>
+<title>LION CREDIT ADMIN V3</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -16,43 +15,39 @@
 body{
 margin:0;
 font-family:Arial;
-background:#0a0a0a;
+background:#0b0f19;
 color:white;
 display:flex;
 }
 
-/* LEFT MENU */
+/* LEFT SIDEBAR */
 .sidebar{
-width:220px;
-background:#111;
-min-height:100vh;
+width:240px;
+background:#0f1629;
+height:100vh;
 padding:20px;
-border-right:1px solid #222;
+box-sizing:border-box;
 }
 
 .sidebar h2{
 color:#d4af37;
-margin-bottom:20px;
-}
-
-.menu{
-display:flex;
-flex-direction:column;
-gap:10px;
+text-align:center;
 }
 
 .menu button{
-background:#1a1a1a;
-color:white;
-border:none;
+width:100%;
+margin-top:10px;
 padding:12px;
+border:none;
 border-radius:10px;
+background:#141b2d;
+color:white;
 cursor:pointer;
-text-align:left;
 }
 
 .menu button:hover{
-background:#222;
+background:#d4af37;
+color:black;
 }
 
 /* MAIN */
@@ -61,40 +56,7 @@ flex:1;
 padding:20px;
 }
 
-/* LOGIN */
-#loginBox{
-max-width:400px;
-margin:120px auto;
-background:#111;
-padding:30px;
-border-radius:15px;
-border:1px solid #333;
-text-align:center;
-}
-
-input{
-width:100%;
-padding:12px;
-margin:10px 0;
-background:#1a1a1a;
-border:1px solid #333;
-color:white;
-border-radius:10px;
-}
-
-button{
-padding:10px 14px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-background:linear-gradient(90deg,#b8860b,#d4af37,#f5d76e);
-color:black;
-font-weight:bold;
-}
-
-button:hover{opacity:.9}
-
-/* STATS */
+/* TOP STATS */
 .stats{
 display:grid;
 grid-template-columns:repeat(4,1fr);
@@ -103,58 +65,48 @@ margin-bottom:20px;
 }
 
 .card{
-background:#111;
+background:#141b2d;
 padding:15px;
-border-radius:12px;
-border:1px solid #222;
-}
-
-.card h3{
-color:#d4af37;
-margin:0;
-font-size:26px;
+border-radius:15px;
+text-align:center;
 }
 
 /* TABLE */
 table{
 width:100%;
 border-collapse:collapse;
-background:#111;
-border-radius:12px;
+background:#141b2d;
+border-radius:10px;
 overflow:hidden;
 }
 
-th{
-background:#1b1b1b;
-color:#d4af37;
+th,td{
 padding:12px;
-}
-
-td{
-padding:10px;
-border-top:1px solid #222;
+border-bottom:1px solid #222;
 text-align:center;
 }
 
-tr:hover{
-background:#1a1a1a;
+th{
+background:#111827;
+color:#d4af37;
 }
 
+/* STATUS */
 .status{
 padding:5px 10px;
 border-radius:8px;
 font-size:12px;
 }
 
-.pending{background:#ffb300;color:black;}
-.approved{background:#00c853;color:black;}
-.rejected{background:#d50000;color:white;}
+.Pending{background:orange;color:black;}
+.Approved{background:green;}
+.Rejected{background:red;}
 
+/* IMAGE */
 img{
 width:70px;
 border-radius:8px;
 cursor:pointer;
-border:1px solid #333;
 }
 
 /* MODAL */
@@ -162,8 +114,9 @@ border:1px solid #333;
 display:none;
 position:fixed;
 top:0;left:0;
-width:100%;height:100%;
-background:rgba(0,0,0,.8);
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
 justify-content:center;
 align-items:center;
 }
@@ -173,53 +126,38 @@ width:400px;
 border-radius:10px;
 }
 
+input{
+padding:10px;
+width:300px;
+margin-bottom:10px;
+border-radius:8px;
+border:none;
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox">
-<h2>🔐 Admin Login</h2>
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-</div>
-
 <!-- SIDEBAR -->
-<div class="sidebar" id="sidebar" style="display:none;">
-<h2>LION ADMIN</h2>
+<div class="sidebar">
+<h2>🦁 LION ADMIN</h2>
 
 <div class="menu">
-<button onclick="loadData()">📋 Dashboard</button>
-<button onclick="loadData()">📄 Applications</button>
+<button onclick="loadData()">📋 All Applications</button>
 <button onclick="logout()">🚪 Logout</button>
 </div>
 </div>
 
 <!-- MAIN -->
-<div class="main" id="panel" style="display:none;">
+<div class="main">
 
+<!-- STATS -->
 <div class="stats">
-<div class="card">
-<h3 id="total">0</h3>
-<p>Total</p>
-</div>
-
-<div class="card">
-<h3 id="pending">0</h3>
-<p>Pending</p>
-</div>
-
-<div class="card">
-<h3 id="approved">0</h3>
-<p>Approved</p>
-</div>
-
-<div class="card">
-<h3 id="rejected">0</h3>
-<p>Rejected</p>
-</div>
+<div class="card">Total<br><span id="total">0</span></div>
+<div class="card">Pending<br><span id="pending">0</span></div>
+<div class="card">Approved<br><span id="approved">0</span></div>
+<div class="card">Rejected<br><span id="rejected">0</span></div>
 </div>
 
 <input id="search" placeholder="Search name or phone..." onkeyup="loadData()">
@@ -252,22 +190,17 @@ border-radius:10px;
 
 auth.onAuthStateChanged(user=>{
 if(user){
-document.getElementById("loginBox").style.display="none";
-document.getElementById("sidebar").style.display="block";
-document.getElementById("panel").style.display="block";
 loadData();
 }
 });
 
-async function login(){
-try{
-await auth.signInWithEmailAndPassword(
-email.value,
-password.value
-);
-}catch(e){
-alert(e.message);
+function openImg(src){
+document.getElementById("modal").style.display="flex";
+document.getElementById("modalImg").src=src;
 }
+
+function closeModal(){
+document.getElementById("modal").style.display="none";
 }
 
 function logout(){
@@ -275,73 +208,72 @@ auth.signOut();
 location.reload();
 }
 
-function showImg(url){
-document.getElementById("modal").style.display="flex";
-document.getElementById("modalImg").src=url;
-}
-
-function closeModal(){
-document.getElementById("modal").style.display="none";
-}
-
 async function loadData(){
 
-tableBody.innerHTML="";
+const search=document.getElementById("search").value.toLowerCase();
 
-let snapshot=await db.collection("submissions").orderBy("created","desc").get();
+const snapshot=await db.collection("submissions").get();
 
 let total=0,pending=0,approved=0,rejected=0;
 
-let keyword=document.getElementById("search").value?.toLowerCase() || "";
+let html="";
 
 snapshot.forEach(doc=>{
 
-let d=doc.data();
+const d=doc.data();
 
-if(keyword &&
-!(d.name?.toLowerCase().includes(keyword) ||
-d.phone?.includes(keyword))) return;
+if(search &&
+!(d.name?.toLowerCase().includes(search) ||
+d.phone?.includes(search))){
+return;
+}
 
 total++;
 
-if(d.status=="Pending") pending++;
-if(d.status=="Approved") approved++;
-if(d.status=="Rejected") rejected++;
+if(d.status=="Pending")pending++;
+if(d.status=="Approved")approved++;
+if(d.status=="Rejected")rejected++;
 
-tableBody.innerHTML+=`
+html+=`
 <tr>
+<td>${d.name||""}</td>
+<td>${d.phone||""}</td>
+<td>${d.loantype||""}</td>
+<td>${d.amount||""}</td>
 
-<td>${d.name || ""}</td>
-<td>${d.phone || ""}</td>
-<td>${d.loantype || ""}</td>
-<td>${d.amount || ""}</td>
+<td><span class="status ${d.status}">${d.status}</span></td>
 
 <td>
-<span class="status ${d.status?.toLowerCase()}">
-${d.status || "Pending"}
-</span>
+${d.frontURL?`<img onclick="openImg('${d.frontURL}')" src="${d.frontURL}">`:""}
 </td>
 
 <td>
-${d.frontURL ? `<img onclick="showImg('${d.frontURL}')" src="${d.frontURL}">` : ""}
+${d.backURL?`<img onclick="openImg('${d.backURL}')" src="${d.backURL}">`:""}
 </td>
 
 <td>
-${d.backURL ? `<img onclick="showImg('${d.backURL}')" src="${d.backURL}">` : ""}
-</td>
-
-<td>
-<button onclick="deleteRecord('${doc.id}')">Delete</button>
+<button onclick="updateStatus('${doc.id}','Approved')">✔</button>
+<button onclick="updateStatus('${doc.id}','Rejected')">✖</button>
+<button onclick="deleteRecord('${doc.id}')">🗑</button>
 </td>
 
 </tr>
 `;
+
 });
+
+document.getElementById("tableBody").innerHTML=html;
 
 document.getElementById("total").innerText=total;
 document.getElementById("pending").innerText=pending;
 document.getElementById("approved").innerText=approved;
 document.getElementById("rejected").innerText=rejected;
+
+}
+
+async function updateStatus(id,status){
+await db.collection("submissions").doc(id).update({status});
+loadData();
 }
 
 async function deleteRecord(id){
