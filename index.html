@@ -1,11 +1,10 @@
-```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>LION CREDIT SYSTEM</title>
+<title>LION CREDIT</title>
 
 <style>
 
@@ -13,80 +12,77 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:'Segoe UI',sans-serif;
+font-family:Arial,sans-serif;
 }
 
 body{
 
 background:
-linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.85)),
-url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80');
+linear-gradient(
+rgba(0,0,0,.72),
+rgba(0,0,0,.88)
+),
+url('hero-bg.jpg');
 
 background-size:cover;
 background-position:center;
+background-repeat:no-repeat;
 background-attachment:fixed;
 
 min-height:100vh;
-
 display:flex;
 justify-content:center;
 align-items:center;
-
 padding:40px 20px;
-
 color:white;
 }
 
 .container{
 
 width:100%;
-max-width:900px;
+max-width:800px;
 
-background:rgba(10,10,10,.75);
+background:rgba(15,15,15,.78);
 
 backdrop-filter:blur(15px);
 
-border:1px solid rgba(255,215,0,.2);
+border:1px solid rgba(212,175,55,.25);
 
 border-radius:25px;
 
 padding:40px;
 
 box-shadow:
-0 0 50px rgba(0,0,0,.6),
-0 0 20px rgba(255,215,0,.15);
+0 0 40px rgba(0,0,0,.6),
+0 0 30px rgba(212,175,55,.15);
 
 }
 
-.logo{
-
+.logoBox{
 text-align:center;
 margin-bottom:30px;
-
 }
 
-.logo img{
+.logoBox img{
 
 width:120px;
 height:120px;
 
-object-fit:cover;
-
 border-radius:50%;
+
+object-fit:cover;
 
 border:3px solid #d4af37;
 
-box-shadow:0 0 20px rgba(212,175,55,.4);
+box-shadow:0 0 30px rgba(212,175,55,.45);
 
 }
 
-.logo h1{
+.logoBox h1{
 
 margin-top:15px;
 
 font-size:42px;
-
-font-weight:700;
 
 color:#d4af37;
 
@@ -94,17 +90,49 @@ letter-spacing:2px;
 
 }
 
-.logo p{
+.logoBox p{
 
-margin-top:10px;
+margin-top:8px;
 
-color:#ddd;
+color:#ccc;
+
+letter-spacing:4px;
+
+font-size:13px;
+
+}
+
+.heroText{
+
+text-align:center;
+
+margin-bottom:30px;
+
+}
+
+.heroText h2{
+
+font-size:34px;
+
+line-height:1.3;
+
+margin-bottom:10px;
+
+}
+
+.gold{
+color:#d4af37;
+}
+
+.heroText p{
+
+color:#ccc;
 
 font-size:15px;
 
 }
 
-.form-grid{
+.grid{
 
 display:grid;
 
@@ -121,7 +149,7 @@ width:100%;
 
 padding:14px;
 
-background:#121212;
+background:#111;
 
 border:1px solid #333;
 
@@ -129,11 +157,9 @@ color:white;
 
 border-radius:12px;
 
-font-size:15px;
-
 outline:none;
 
-transition:.3s;
+font-size:15px;
 
 }
 
@@ -142,14 +168,12 @@ select:focus{
 
 border-color:#d4af37;
 
-box-shadow:0 0 10px rgba(212,175,55,.3);
+box-shadow:0 0 10px rgba(212,175,55,.4);
 
 }
 
 .full{
-
-grid-column:1/3;
-
+grid-column:1 / span 2;
 }
 
 label{
@@ -161,13 +185,25 @@ margin-bottom:8px;
 
 color:#d4af37;
 
-font-weight:600;
+font-size:14px;
 
 }
 
 .filebox{
 
-background:#121212;
+grid-column:1 / span 2;
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:20px;
+
+}
+
+.upload{
+
+background:#111;
 
 padding:15px;
 
@@ -177,28 +213,39 @@ border:1px solid #333;
 
 }
 
-.submit-btn{
-
-width:100%;
-
-margin-top:30px;
-
-padding:16px;
-
-font-size:18px;
-
-font-weight:700;
+.upload input{
 
 border:none;
 
-border-radius:15px;
+padding:0;
+
+background:none;
+
+}
+
+button{
+
+width:100%;
+
+padding:16px;
+
+margin-top:25px;
+
+border:none;
+
+border-radius:12px;
+
+font-size:18px;
+
+font-weight:bold;
 
 cursor:pointer;
 
 background:linear-gradient(
-135deg,
-#f7d774,
-#d4af37
+90deg,
+#b8860b,
+#d4af37,
+#f5d76e
 );
 
 color:black;
@@ -207,61 +254,61 @@ transition:.3s;
 
 }
 
-.submit-btn:hover{
+button:hover{
 
-transform:translateY(-3px);
+transform:translateY(-2px);
 
-box-shadow:
-0 10px 25px rgba(212,175,55,.35);
+box-shadow:0 0 25px rgba(212,175,55,.5);
 
 }
 
 .stats{
 
-display:flex;
+display:grid;
 
-justify-content:space-between;
-
-margin-bottom:35px;
+grid-template-columns:repeat(3,1fr);
 
 gap:15px;
+
+margin-bottom:30px;
 
 }
 
 .card{
 
-flex:1;
+background:#111;
 
-padding:20px;
+padding:15px;
+
+border-radius:15px;
 
 text-align:center;
 
-background:rgba(255,255,255,.03);
-
-border:1px solid rgba(255,215,0,.15);
-
-border-radius:15px;
+border:1px solid rgba(212,175,55,.15);
 
 }
 
 .card h3{
 
 color:#d4af37;
-font-size:30px;
+
+font-size:28px;
 
 }
 
-.card span{
+.card p{
 
-color:#bbb;
+margin-top:5px;
 
-font-size:14px;
+font-size:13px;
+
+color:#aaa;
 
 }
 
 @media(max-width:768px){
 
-.form-grid{
+.grid{
 grid-template-columns:1fr;
 }
 
@@ -269,12 +316,20 @@ grid-template-columns:1fr;
 grid-column:auto;
 }
 
-.stats{
-flex-direction:column;
+.filebox{
+grid-template-columns:1fr;
 }
 
-.logo h1{
-font-size:28px;
+.stats{
+grid-template-columns:1fr;
+}
+
+.logoBox h1{
+font-size:32px;
+}
+
+.heroText h2{
+font-size:26px;
 }
 
 }
@@ -286,37 +341,49 @@ font-size:28px;
 
 <div class="container">
 
-<div class="logo">
+<div class="logoBox">
 
-<!-- 换成你的Logo -->
 <img src="logo.jpg">
 
 <h1>LION CREDIT</h1>
 
-<p>Fast • Secure • Professional Financial Solutions</p>
+<p>FINANCIAL SOLUTIONS</p>
+
+</div>
+
+<div class="heroText">
+
+<h2>
+FAST. SECURE.
+<span class="gold">FINANCIAL FREEDOM.</span>
+</h2>
+
+<p>
+Trusted by thousands. Fast approval. High success rate.
+</p>
 
 </div>
 
 <div class="stats">
 
 <div class="card">
+<h3>10,000+</h3>
+<p>Happy Clients</p>
+</div>
+
+<div class="card">
 <h3>24H</h3>
-<span>Fast Approval</span>
+<p>Fast Approval</p>
 </div>
 
 <div class="card">
 <h3>98%</h3>
-<span>Approval Rate</span>
-</div>
-
-<div class="card">
-<h3>SGD 50M+</h3>
-<span>Loans Approved</span>
+<p>Approval Rate</p>
 </div>
 
 </div>
 
-<div class="form-grid">
+<div class="grid">
 
 <input id="name" placeholder="Full Name">
 
@@ -324,7 +391,7 @@ font-size:28px;
 
 <input id="email" placeholder="Email Address">
 
-<input id="company" placeholder="Company Name">
+<input id="company" placeholder="Company">
 
 <input id="income" placeholder="Monthly Income">
 
@@ -333,12 +400,7 @@ font-size:28px;
 <select id="loantype">
 
 <option>Personal Loan</option>
-
 <option>Business Loan</option>
-
-<option>Renovation Loan</option>
-
-<option>Debt Consolidation</option>
 
 </select>
 
@@ -349,39 +411,38 @@ font-size:28px;
 <option>SGD 10,000</option>
 <option>SGD 20,000</option>
 <option>SGD 50,000</option>
-<option>SGD 100,000</option>
 
 </select>
 
-<div class="full">
+<div class="filebox">
+
+<div class="upload">
 
 <label>IC Front</label>
 
-<div class="filebox">
-<input type="file" id="icFront" accept="image/*">
-</div>
+<input type="file"
+id="icFront"
+accept="image/*">
 
 </div>
 
-<div class="full">
+<div class="upload">
 
 <label>IC Back</label>
 
-<div class="filebox">
-<input type="file" id="icBack" accept="image/*">
+<input type="file"
+id="icBack"
+accept="image/*">
+
+</div>
+
 </div>
 
 </div>
 
-<div class="full">
-
-<button class="submit-btn" onclick="submitForm()">
+<button onclick="submitForm()">
 SUBMIT APPLICATION
 </button>
-
-</div>
-
-</div>
 
 </div>
 
@@ -423,6 +484,7 @@ const amount=document.getElementById("amount").value;
 if(!name || !phone || !icnumber){
 
 alert("Please fill required fields");
+
 return;
 
 }
@@ -451,6 +513,7 @@ income,
 icnumber,
 loantype,
 amount,
+
 frontURL,
 backURL,
 
@@ -470,4 +533,3 @@ location.reload();
 
 </body>
 </html>
-```
