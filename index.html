@@ -2,79 +2,209 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Loan System V8</title>
+<title>LION CREDIT SYSTEM V8 ENTERPRISE</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script src="firebase.js"></script>
 
 <style>
-body{margin:0;font-family:Arial;background:#0b0f19;color:white;}
-.container{max-width:700px;margin:40px auto;padding:30px;background:#141b2d;border-radius:15px;}
-input,select{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:none;}
-button{width:100%;padding:14px;background:#00c853;border:none;color:white;border-radius:8px;}
+
+/* ===== GLOBAL ===== */
+body{
+margin:0;
+font-family:Arial;
+color:white;
+background:url('hero-bg.jpg') no-repeat center center fixed;
+background-size:cover;
+}
+
+/* DARK OVERLAY */
+.overlay{
+min-height:100vh;
+background:rgba(0,0,0,.72);
+display:flex;
+justify-content:center;
+align-items:center;
+padding:40px;
+}
+
+/* CARD */
+.container{
+width:460px;
+background:rgba(15,23,42,.95);
+border-radius:18px;
+padding:30px;
+box-shadow:0 0 40px rgba(0,0,0,.6);
+backdrop-filter:blur(10px);
+animation:fadeIn .6s ease;
+}
+
+/* TITLE */
+h1{
+text-align:center;
+margin-bottom:25px;
+font-size:24px;
+letter-spacing:1px;
+}
+
+/* INPUTS */
+input,select{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:none;
+border-radius:10px;
+outline:none;
+background:#1f2937;
+color:white;
+}
+
+input::placeholder{
+color:#aaa;
+}
+
+/* LABEL */
+label{
+font-size:13px;
+opacity:.8;
+margin-top:8px;
+display:block;
+}
+
+/* BUTTON */
+button{
+width:100%;
+padding:14px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+background:linear-gradient(90deg,#00c853,#00e676);
+color:white;
+font-size:16px;
+cursor:pointer;
+transition:.2s;
+}
+
+button:hover{
+transform:scale(1.02);
+opacity:.9;
+}
+
+/* FOOTER */
+small{
+display:block;
+text-align:center;
+margin-top:10px;
+opacity:.6;
+font-size:12px;
+}
+
+/* ANIMATION */
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(20px);}
+to{opacity:1;transform:translateY(0);}
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="container">
-<h2>Loan Application V8</h2>
+<div class="overlay">
 
-<input id="name" placeholder="Name">
-<input id="phone" placeholder="Phone">
+<div class="container">
+
+<h1>🦁 LION CREDIT SYSTEM</h1>
+
+<label>Full Name</label>
+<input id="name" placeholder="Enter full name">
+
+<label>Phone Number</label>
+<input id="phone" placeholder="Enter phone">
+
+<label>Email</label>
+<input id="email" placeholder="Enter email">
+
+<label>Company</label>
+<input id="company" placeholder="Company name">
+
+<label>Monthly Income</label>
 <input id="income" placeholder="Income">
 
-<select id="type">
-<option>Personal</option>
-<option>Business</option>
+<label>IC Number</label>
+<input id="icnumber" placeholder="NRIC / ID">
+
+<label>Loan Type</label>
+<select id="loantype">
+<option>Personal Loan</option>
+<option>Business Loan</option>
 </select>
 
+<label>Loan Amount</label>
 <select id="amount">
 <option>1000</option>
 <option>5000</option>
 <option>10000</option>
+<option>20000</option>
+<option>50000</option>
 </select>
 
-<button onclick="submit()">Submit</button>
+<label>IC Front</label>
+<input type="file" id="icFront">
+
+<label>IC Back</label>
+<input type="file" id="icBack">
+
+<button onclick="submitForm()">Submit Application</button>
+
+<small>Secure Banking System • Powered by Firebase</small>
+
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="firebase.js"></script>
+</div>
 
 <script>
 
-let lock=false;
-
-function riskScore(data){
-
-let score=0;
-if(data.amount>5000) score+=30;
-if(data.type==="Business") score+=20;
-if(data.income<3000) score+=30;
-
-return score;
+/* ===== BASE64 FILE ===== */
+function fileToBase64(file){
+return new Promise((res,rej)=>{
+const r=new FileReader();
+r.onload=()=>res(r.result);
+r.onerror=rej;
+r.readAsDataURL(file);
+});
 }
 
-async function submit(){
+/* ===== SUBMIT ===== */
+async function submitForm(){
 
-if(lock) return;
-lock=true;
+const front=document.getElementById("icFront").files[0];
+const back=document.getElementById("icBack").files[0];
 
-const data={
-name: name.value,
-phone: phone.value,
-income: income.value,
-type: type.value,
-amount: amount.value,
+await db.collection("applications").add({
+
+name:document.getElementById("name").value,
+phone:document.getElementById("phone").value,
+email:document.getElementById("email").value,
+company:document.getElementById("company").value,
+income:document.getElementById("income").value,
+icnumber:document.getElementById("icnumber").value,
+loantype:document.getElementById("loantype").value,
+amount:document.getElementById("amount").value,
+
+frontURL: front ? await fileToBase64(front) : "",
+backURL: back ? await fileToBase64(back) : "",
+
 status:"Pending",
-created:firebase.firestore.FieldValue.serverTimestamp()
-};
+created:new Date()
 
-data.risk=riskScore(data);
+});
 
-await db.collection("applications").add(data);
-
-alert("Submitted");
-
-lock=false;
+alert("Application Submitted Successfully");
+location.reload();
 }
 
 </script>
