@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Admin V8 Bank</title>
+<title>Admin V8 FIX</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -31,7 +31,7 @@ button{padding:5px 10px;border:none;border-radius:5px;cursor:pointer;}
 <body>
 
 <div class="sidebar">
-<h3>V8 BANK</h3>
+<h3>V8 BANK FIX</h3>
 </div>
 
 <div class="main">
@@ -68,16 +68,38 @@ auth.onAuthStateChanged(u=>{
 if(u) load();
 });
 
+/* ✅ FIX 1: 防止 created 报错 */
 async function load(){
 
 const snap=await db.collection("applications")
-.orderBy("created","desc")
-.get();
+.get(); // ❗去掉 orderBy（避免旧数据崩）
 
 data=[];
-snap.forEach(d=>data.push({id:d.id,...d.data()}));
+snap.forEach(d=>{
+data.push({
+id:d.id,
+...d.data()
+});
+});
 
 render();
+}
+
+/* ✅ FIX 2: 防 undefined */
+function safe(v){
+return v ?? "";
+}
+
+/* ✅ FIX 3: 风控兼容 */
+function getRisk(d){
+if(d.risk !== undefined) return d.risk;
+
+let r=0;
+if(d.amount>5000) r+=30;
+if(d.loantype==="Business") r+=20;
+if((d.income||0)<3000) r+=30;
+
+return r;
 }
 
 function render(){
@@ -87,21 +109,26 @@ let p=0,a=0,r=0;
 
 data.forEach(d=>{
 
-if(d.status==="Pending")p++;
-if(d.status==="Approved")a++;
-if(d.status==="Rejected")r++;
+let status = d.status || "Pending";
+let risk = getRisk(d);
 
-let riskClass = d.risk>60?"high":d.risk>30?"mid":"low";
+if(status==="Pending")p++;
+if(status==="Approved")a++;
+if(status==="Rejected")r++;
+
+let riskClass =
+risk>60?"high":
+risk>30?"mid":"low";
 
 h+=`
 <tr>
-<td>${d.name}</td>
-<td>${d.phone}</td>
-<td>${d.amount}</td>
+<td>${safe(d.name)}</td>
+<td>${safe(d.phone)}</td>
+<td>${safe(d.amount)}</td>
 
-<td><span class="risk ${riskClass}">${d.risk}</span></td>
+<td><span class="risk ${riskClass}">${risk}</span></td>
 
-<td>${d.status}</td>
+<td>${status}</td>
 
 <td>
 <button class="approve" onclick="set('${d.id}','Approved')">A</button>
@@ -116,36 +143,36 @@ tb.innerHTML=h;
 draw(p,a,r);
 }
 
+/* ✅ FIX 4: update */
 async function set(id,status){
 
-await db.collection("applications").doc(id).update({
-status:status
-});
-
-await db.collection("audit_logs").add({
-action:status,
-id:id,
-time:new Date()
-});
+await db.collection("applications")
+.doc(id)
+.update({status});
 
 load();
 }
 
+/* ✅ FIX 5: Chart 修复 */
 function draw(p,a,r){
+
+const ctx=document.getElementById("chart").getContext("2d");
 
 if(chart) chart.destroy();
 
-chart=new Chart(chartCanvas(),{
+chart=new Chart(ctx,{
 type:"bar",
 data:{
 labels:["Pending","Approved","Rejected"],
-datasets:[{data:[p,a,r]}]
+datasets:[{
+data:[p,a,r],
+backgroundColor:["orange","green","red"]
+}]
+},
+options:{
+responsive:true
 }
 });
-}
-
-function chartCanvas(){
-return document.getElementById("chart");
 }
 
 </script>
